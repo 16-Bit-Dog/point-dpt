@@ -39,3 +39,4 @@ face your hand flat to keep all 5 finger tips visible inside the rendered frame 
 - The AI to create depth properly for the index finger and index finger bone
 - Our hand tracker to map out the hand (described by white lines and red dots for bone structure being mapped -- with purple for the 'pointing finger' important parts of the hand)
 an example image is below:  
+![image](https://user-images.githubusercontent.com/67922228/236642694-6238aaa0-9d31-4570-9cec-4dc364f1a560.png)
