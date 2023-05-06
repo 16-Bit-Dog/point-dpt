@@ -15,15 +15,18 @@ We used the direction vector to perform ray marching to find where the finger is
 3. not satisfied 1. or 2. so we add X & Y & Z direction vector to our current ray position
 ![image](https://user-images.githubusercontent.com/67922228/236638892-2f4be85d-e4e6-4f4f-ab78-f00ebf738d94.png)
 
-###Recommended Hardware (for real time processing): 
+### Recommended Hardware (for real time processing): 
 - Jetson Orin Nano (embedded AI hardware makes this a substantially cheaper option to use) 
 or 
 - RTX 3060 
 
-###Future use-cases 
+### Future use-cases 
 assuming performance issues are not of notiable issue -- since camrea images can easily be sent as a low resolutuon to be processed by an off short server to remove client overhead of using the AI model 
 - very intuitive UX/UI without special depth reading hardware
 - useful for placement of furniture using finger gestures
 - powerful for mapping hand movments of patients with poor control of hand mobility
 - enables pointing out objects of intrest when words are not avaible for an individual to speak -- specifically allowing better text to speech tools by pointing at blocks of words
 - empowers hardware with less capabilities to run AR/VR applications which use depth data
+
+### How To Build:
+
