@@ -4,3 +4,4 @@ Pillow==9.5.0
 requests==2.22.0
 torch==2.0.0
 transformers==4.28.1
+accelerate==0.18.0

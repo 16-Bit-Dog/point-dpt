@@ -50,7 +50,7 @@ class handTracker():
         self.model = None
         self.device = None
 
-        cudaFound = False
+        self.cudaFound = False
 
     def getWidthOfCurrImage(self):
         return int(len(self.currImage[0]))
@@ -187,7 +187,7 @@ def main():
     tracker.model = DPTForDepthEstimation.from_pretrained("Intel/dpt-hybrid-midas", low_cpu_mem_usage=True)
     #
     #get computational device -- prefer cuda
-    if torch.cuda.is_available:
+    if torch.cuda.is_available():
         tracker.device = torch.device("cuda:0")
         tracker.cudaFound = True
     else:
@@ -218,7 +218,7 @@ def main():
 
         #draw images
         cv2.imshow("Video",tracker.currImage)
-        cv2.imshow("Depth", tracker.currDepth)
+        # cv2.imshow("Depth", tracker.currDepth)
         
         cv2.waitKey(1)
 
