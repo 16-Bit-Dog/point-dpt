@@ -6,18 +6,6 @@ import torch
 import time
 import math
 
-#program works best with a flat hand to point at objects due to AI reading hand better for depth -- works best when it sees wrist
-#works best closer 
-
-#Async work on average logic for loc depth and such for Parkinson's pointer feature?
-#TODO: figure out that crash  File "c:\CodeRepos\BradikenisticPointer\BradikenisticPointer\handtrack.py", line 58, in getZfromDepth
-        #return self.currDepth[cy][cx]
-        #IndexError: index 384 is out of bounds for axis 0 with size 384
-#TODO: may need to otherwise add a buffer: CANNOT HIT IF Z IS +-10 of starting Z 
-#TODO: adjust param of model --> to make it less polar from 255->150 and 150->0, since this is an ISSUE!!!! 
-#TODO: add the average for parkinsons
-#may need to adjust hand tracker walker -- to get depth before applying AI hands to do walker on
-
 class handTracker():
 
     def __init__(self, mode=False, maxHands=1, detectionCon=0.6,modelComplexity=1,trackCon=0.6):
@@ -50,7 +38,7 @@ class handTracker():
         self.model = None
         self.device = None
 
-        self.cudaFound = False
+        cudaFound = False
 
     def getWidthOfCurrImage(self):
         return int(len(self.currImage[0]))
@@ -187,7 +175,7 @@ def main():
     tracker.model = DPTForDepthEstimation.from_pretrained("Intel/dpt-hybrid-midas", low_cpu_mem_usage=True)
     #
     #get computational device -- prefer cuda
-    if torch.cuda.is_available():
+    if torch.cuda.is_available:
         tracker.device = torch.device("cuda:0")
         tracker.cudaFound = True
     else:
@@ -218,7 +206,7 @@ def main():
 
         #draw images
         cv2.imshow("Video",tracker.currImage)
-        # cv2.imshow("Depth", tracker.currDepth)
+        cv2.imshow("Depth", tracker.currDepth)
         
         cv2.waitKey(1)
 
