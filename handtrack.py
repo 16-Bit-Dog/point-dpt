@@ -21,7 +21,7 @@ import math
 
 class handTracker():
 
-    def __init__(self, mode=False, maxHands=1, detectionCon=0.4,modelComplexity=1,trackCon=0.4):
+    def __init__(self, mode=False, maxHands=1, detectionCon=0.6,modelComplexity=1,trackCon=0.6):
         self.mode = mode
         self.maxHands = maxHands
         self.detectionCon = detectionCon
@@ -41,10 +41,10 @@ class handTracker():
         self.wristY = -1 #hand 5 
         self.wristZ = -1 
 
-        self.fingerDirVecX = 0
-        self.fingerDirVecY = 0 
-        self.fingerDirVecY = 0 
-        
+        self.fingerDirVecX = -1
+        self.fingerDirVecY = -1
+        self.fingerDirVecZ = -1 
+    
         self.currDepth = []
         self.currImage = []
         self.feature_extractor = None
@@ -59,11 +59,11 @@ class handTracker():
         return self.getHeightOfCurrImage()/self.getWidthOfCurrImage()
 
     def getZfromDepth(self, cx, cy): # higher z is closer to cam 
-        if(cy >= int(len(self.currDepth)) or cx>=int(len(self.currDepth[cy]))):
+        if(cy >= int(len(self.currDepth)) or cx>=int(len(self.currDepth[int(cy)]))):
             return -1
         else:
             #print(len(self.currDepth[cy]))
-            return self.currDepth[cy][cx]
+            return self.currDepth[int(cy)][int(cx)]
 
     def DrawFailCode(self):
         cv2.putText(self.currImage, "No Hit", (int(self.getWidthOfCurrImage()/2), int(self.getHeightOfCurrImage()/2)), 1, 1,(255,0,0), 2, cv2.LINE_AA)
@@ -80,13 +80,13 @@ class handTracker():
             elif(cy<0 or cy >= self.getHeightOfCurrImage()):
                 print("failed Y")
                 return None
-            elif(cz < self.getZfromDepth(cx,cy)):
-                cv2.circle(self.currImage,(cx,cy), 10 , (255,50,0), cv2.FILLED) #HIT OBJECT, DO STUFF
+            elif(cz < self.getZfromDepth(cx,cy) and cz < self.nailPosZ-(abs(self.nailPosZ-self.wristZ))):
+                cv2.circle(self.currImage,(int(cx),int(cy)), 10 , (255,50,0), cv2.FILLED) #HIT OBJECT, DO STUFF
                 return 1
             else:
-                cx+=int(self.fingerDirVecX)
-                cy+=int(self.fingerDirVecY*self.getRatioYX())
-                cz+=int(-1*(abs(self.fingerDirVecZ**0.8))) #incase you have hand over predicted hand location -- need -
+                cx+=(self.fingerDirVecX)
+                cy+=(self.fingerDirVecY)
+                cz+=(-1*(abs(self.fingerDirVecZ))) #incase you have hand over predicted hand location -- need -
                 
 
 
@@ -100,7 +100,7 @@ class handTracker():
                             predicted_depth.unsqueeze(1),
                             size= (self.getHeightOfCurrImage(),self.getWidthOfCurrImage()), 
                             #scale_factor = ,
-                            mode="bilinear",
+                            mode="bicubic",
                             align_corners=False,
                     ).squeeze()
         outputGPU = prediction.cuda()
@@ -121,7 +121,7 @@ class handTracker():
                 if draw:
                     self.mpDraw.draw_landmarks(image, handLms, self.mpHands.HAND_CONNECTIONS)
                     
-        return cv2.resize(image, (int(self.getWidthOfCurrImage()*0.8),int(self.getHeightOfCurrImage()*0.8)), interpolation = cv2.INTER_AREA)
+        return cv2.resize(image, (int(self.getWidthOfCurrImage()),int(self.getHeightOfCurrImage())), interpolation = cv2.INTER_AREA)
     
     def positionFinder(self,image, handNo=0, draw=True):
         foundNail = False
@@ -141,7 +141,7 @@ class handTracker():
                         cv2.circle(image,(cx,cy), 15 , (255,0,255), cv2.FILLED)
                     foundNail = True
                 
-                elif id == 5: 
+                elif id == 6: 
                     self.wristX = cx
                     self.wristY = cy
                     self.wristZ = self.getZfromDepth(cx,cy)
@@ -150,17 +150,24 @@ class handTracker():
                     foundBase = True
                     
             
-            self.fingerDirVecX = self.nailPosX - self.wristX
-            self.fingerDirVecY = self.nailPosX - self.wristY
-            self.fingerDirVecZ = self.nailPosZ - self.wristZ
+            self.fingerDirVecX = (self.nailPosX - self.wristX)/10
+            self.fingerDirVecY = (self.nailPosY - self.wristY)/10
+            self.fingerDirVecZ = (self.nailPosZ - self.wristZ)/10
+            if(self.fingerDirVecZ>10):
+                self.fingerDirVecZ= self.fingerDirVecZ/10
+            #length = (self.fingerDirVecX**2+self.fingerDirVecY**2+self.fingerDirVecZ**2)**0.5
+            #self.fingerDirVecX = self.fingerDirVecX/length  
+            #self.fingerDirVecY = self.fingerDirVecY/length 
+            #self.fingerDirVecZ = self.fingerDirVecZ/length 
+            
             print((self.fingerDirVecX,self.fingerDirVecY,self.fingerDirVecZ))
             
-            if foundBase == False:
-                self.wristX = -1
-                self.wristY = -1
-            if foundNail == False:
-                self.nailPosX = -1
-                self.nailPosY = -1 
+            #if foundBase == False:
+            #    self.wristX = -1
+            #    self.wristY = -1
+            #if foundNail == False:
+            #    self.nailPosX = -1
+            #    self.nailPosY = -1 
                 
 
 
@@ -172,7 +179,7 @@ def main():
     cap = cv2.VideoCapture(0)
     tracker = handTracker()
     tracker.feature_extractor = DPTFeatureExtractor.from_pretrained("Intel/dpt-hybrid-midas")
-    tracker.model = DPTForDepthEstimation.from_pretrained("Intel/dpt-hybrid-midas", low_cpu_mem_usage=False)    
+    tracker.model = DPTForDepthEstimation.from_pretrained("Intel/dpt-hybrid-midas", low_cpu_mem_usage=True)    
     tracker.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print(tracker.device)
     tracker.model.to(tracker.device)
