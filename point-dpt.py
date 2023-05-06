@@ -37,8 +37,19 @@ class handTracker():
         self.feature_extractor = None
         self.model = None
         self.device = None
+        
+        self.cudaFound = False
 
-        cudaFound = False
+        self.frameNum = 1
+        self.AccumX = 0
+        self.AccumY = 0
+
+    def IncFrameNum(self):
+        self.frameNum+=1
+        if(self.frameNum == 7):
+            self.frameNum = 1
+            self.AccumX = 0
+            self.AccumY = 0
 
     def getWidthOfCurrImage(self):
         return int(len(self.currImage[0]))
@@ -72,8 +83,11 @@ class handTracker():
                 print("failed Y")
                 return None
             #following code checks if your tracker position is behind the finger 
-            elif(cz < self.getZfromDepth(cx,cy) and cz < self.nailPosZ-(abs(self.nailPosZ-self.wristZ))): #pushes nail backwards based on distance from base of finger to nail, this helps stop the moving 1 step and hitting same finger the tracker spawned from
-                cv2.circle(self.currImage,(int(cx),int(cy)), 10 , (255,50,0), cv2.FILLED) #HIT OBJECT, DO STUFF
+            elif(cz < self.getZfromDepth(cx,cy) and cz < self.nailPosZ-(abs(self.nailPosZ-self.wristZ+10))): #pushes nail backwards based on distance from base of finger to nail, this helps stop the moving 1 step and hitting same finger the tracker spawned from
+                self.AccumX+=cx
+                self.AccumY+=cy
+                
+                cv2.circle(self.currImage,(int(self.AccumX/self.frameNum),int(self.AccumY/self.frameNum)), 10 , (255,50,0), cv2.FILLED) #HIT OBJECT, DO STUFF
                 return 1
             # Have not hit object yet, update current position
             else: 
@@ -186,7 +200,7 @@ def main():
     
     #program main loop
     while True:
-
+        tracker.IncFrameNum()
         success,tracker.currImage = cap.read()
 
         #uses model to find hand

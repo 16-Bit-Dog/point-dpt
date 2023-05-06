@@ -34,3 +34,8 @@ Clone the repo:<br />
 Install requirments by running the following command in the point-dpt directory<br />
 ```$ pip install -r requirments.txt```
 
+### RECCOMENDED METHOD TO USING THE PROGRAM
+face your hand flat to keep all 5 finger tips visible inside the rendered frame this is to allow:
+- The AI to create depth properly for the index finger and index finger bone
+- Our hand tracker to map out the hand (described by white lines and red dots for bone structure being mapped -- with purple for the 'pointing finger' important parts of the hand)
+an example image is below:  
