@@ -5,12 +5,15 @@ from transformers import DPTFeatureExtractor, DPTForDepthEstimation
 import torch
 import time
 
-#TODO: we need Z axis, depth of finger nail, and body, avg to get final component of vector
-\
+#program works best with a flat hand to point at objects due to AI reading hand better for depth
+
+#TODO: may need before hand and after for depth reading
+
 #Instantiation for the handTracker to hold tracking variables for video capture.
 class handTracker():
 
-        
+
+
     def __init__(self, mode=False, maxHands=2, detectionCon=0.5,modelComplexity=1,trackCon=0.5):
         self.mode = mode
         self.maxHands = maxHands
@@ -25,50 +28,63 @@ class handTracker():
         #variables for position and directional vector of fingers
         self.nailPosX = 0 #hand 8
         self.nailPosY = 0 #hand 8
-        self.fingerDirVecX = 0
-        self.fingerDirVecY = 0 
+        self.nailPosZ = 0 
+
         self.wristX = 0 #hand 0 
         self.wristY = 0 #hand 0 
+        self.wristZ = 0 
+
+        self.fingerDirVecX = 0
+        self.fingerDirVecY = 0 
+        self.fingerDirVecY = 0 
+        
         self.currDepth = []
         self.currImage = []
         self.feature_extractor = None
         self.model = None
         self.device = None
 
-    def GetDepthNew(self): #REMEMBER: run on GPU AS LONG AS POSSABLE, conevert to cpu minimal
-        print("1")
+    def getWidthOfCurrImage(self):
+        return int(len(self.currImage[0]))
+    def getHeightOfCurrImage(self):
+        return int(len(self.currImage))
+
+    def getZfromDepth(self, x, y): # higher z is closer to cam 
+        return self.currDepth[y][x]
+
+    def walkTillHit(self):
+        cx = self.nailPosX
+        cy = self.nailPosY
+        cz = self.nailPosZ
+        #in body
+        if(cx<0 or cx > self.getWidthOfCurrImage()):
+            return None
+        if(cy<0 or cy > self.getHeightOfCurrImage()):
+            return None
+        if(cz < self.getZfromDepth(cx,cy)):
+            pass #HIT OBJECT, DO STUFF
+
+    def GetDepthNew(self): #REMEMBER: run on GPU AS LONG AS POSSABLE, conevert to cpu minimal --   torch.cuda.synchronize() to test if gpu slow since .cpu() is a sync point -- use manual         torch.cuda.synchronize()
         pixel_values = self.feature_extractor(self.currImage, return_tensors="pt").pixel_values
         with torch.no_grad(): 
-            print("a")
+            
             outputs = self.model(pixel_values.to(self.device)) 
-            print("b")
             predicted_depth = outputs.predicted_depth
         # interpolate to original size
         prediction = torch.nn.functional.interpolate( # is expression does not run
                             predicted_depth.unsqueeze(1),
-                            size= (int(len(self.currImage)),int(len(self.currImage[0]))), 
+                            size= (self.getHeightOfCurrImage(),self.getWidthOfCurrImage()), 
                             #scale_factor = ,
                             mode="bilinear",
                             align_corners=False,
                     ).squeeze()
-        print("c")
         outputGPU = prediction.cuda()
-        print("2")
-        output = outputGPU.detach().cpu().numpy() #run  prediction on gpu, and move to cpu tensor, then convert to numpy
-        #output = prediction.cpu().numpy() # rn slow
-        print("d")
+        #print("a")
+        output = outputGPU.detach().cpu().numpy() 
+        #print("b")
         formatted = (output * 255 / np.max(output)).astype('uint8')
-        print("e")
+        #print("c")
         return formatted
-
-#    def ConvertToGreyScale(self, image): #Converting the background to grey, managing depth 
-#        return cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
-#    def GetDepth(self):
-#        
-#        stereo = cv2.StereoBM_create(numDisparities=256, blockSize=255)
-#        disparity = stereo.compute(self.prevGrey, self.currGrey)
-#        cv2.imshow("depth",disparity)
 
     def handsFinder(self,image,draw=True):
         imageRGB = cv2.cvtColor(image,cv2.COLOR_BGR2RGB)
@@ -80,7 +96,7 @@ class handTracker():
                 if draw:
                     self.mpDraw.draw_landmarks(image, handLms, self.mpHands.HAND_CONNECTIONS)
                     
-        return cv2.resize(image, (int(len(image[0])*0.8),int(len(image)*0.8)), interpolation = cv2.INTER_AREA)
+        return cv2.resize(image, (int(self.getWidthOfCurrImage()*0.8),int(self.getHeightOfCurrImage()*0.8)), interpolation = cv2.INTER_AREA)
     
     def positionFinder(self,image, handNo=0, draw=True):
         
@@ -89,17 +105,27 @@ class handTracker():
             for id, lm in enumerate(Hand.landmark): #we only need pos 8, and 7-5 avg
                 h,w,c = image.shape
                 cx,cy = int(lm.x*w), int(lm.y*h)
+                if(cx>len(image[0]) or cy > len(image)): #Making sure not off right side of screen
+                    break
                 if id == 8:
                     self.nailPosX = cx
                     self.nailPosY = cy
+                    
+                    self.nailPosZ = self.getZfromDepth(cx,cy)
                 
                 elif id == 0: #body of finger
                     self.wristX = cx
                     self.wristY = cy
-                        
-                    self.fingerDirVecX = self.nailPosX - self.wristX
-                    self.fingerDirVecY = self.nailPosX - self.wristY
-                        
+                    self.wristZ = self.getZfromDepth(cx,cy)
+                    
+                self.fingerDirVecX = self.nailPosX - self.wristX
+                self.fingerDirVecY = self.nailPosX - self.wristY
+                self.fingerDirVecZ = self.nailPosZ - self.wristZ
+
+                print(self.nailPosZ)
+                print(self.wristZ)
+                print("\n")
+
                 if id in [8, 0]:
                     #lmlist.append([id,cx,cy])
                     if draw:
@@ -119,9 +145,8 @@ def main():
     #Launch video capture from standard position of computer camera.
     cap = cv2.VideoCapture(0)
     tracker = handTracker()
-    tracker.feature_extractor = DPTFeatureExtractor.from_pretrained("Intel/dpt-large")
-    tracker.model = DPTForDepthEstimation.from_pretrained("Intel/dpt-large")
-    
+    tracker.feature_extractor = DPTFeatureExtractor.from_pretrained("Intel/dpt-hybrid-midas")
+    tracker.model = DPTForDepthEstimation.from_pretrained("Intel/dpt-hybrid-midas", low_cpu_mem_usage=True)    
     tracker.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print(tracker.device)
     tracker.model.to(tracker.device)
