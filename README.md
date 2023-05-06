@@ -29,4 +29,8 @@ assuming performance issues are not of notiable issue -- since camrea images can
 - empowers hardware with less capabilities to run AR/VR applications which use depth data
 
 ### How To Build:
+Clone the repo:<br />
+```$ git clone https://github.com/16-Bit-Dog/point-dpt```<br />
+Install requirments by running the following command in the point-dpt directory<br />
+```$ pip install -r requirments.txt```
 
