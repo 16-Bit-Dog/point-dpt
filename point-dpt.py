@@ -46,7 +46,7 @@ class handTracker():
 
     def IncFrameNum(self):
         self.frameNum+=1
-        if(self.frameNum == 7):
+        if(self.frameNum == 12):
             self.frameNum = 1
             self.AccumX = 0
             self.AccumY = 0
@@ -91,6 +91,10 @@ class handTracker():
                 return 1
             # Have not hit object yet, update current position
             else: 
+                if(cz == 0): #if weird behavior from AI model
+                    print("failed Z")
+                    return None
+                
                 cx+=(self.fingerDirVecX)
                 cy+=(self.fingerDirVecY)
                 cz+=(-1*(abs(self.fingerDirVecZ))) #incase you have hand over predicted hand location -- need -
