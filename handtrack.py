@@ -56,7 +56,7 @@ class handTracker():
     def getHeightOfCurrImage(self):
         return int(len(self.currImage))
     def getRatioYX(self):
-        self.getHeightOfCurrImage()/self.getWidthOfCurrImage()
+        return self.getHeightOfCurrImage()/self.getWidthOfCurrImage()
 
     def getZfromDepth(self, cx, cy): # higher z is closer to cam 
         if(cy >= int(len(self.currDepth)) or cx>=int(len(self.currDepth[cy]))):
@@ -87,7 +87,7 @@ class handTracker():
                 cx+=int(self.fingerDirVecX)
                 cy+=int(self.fingerDirVecY*self.getRatioYX())
                 cz+=int(-1*(abs(self.fingerDirVecZ**0.8))) #incase you have hand over predicted hand location -- need -
-                print(cz)
+                
 
 
     def GetDepthNew(self): #REMEMBER: run on GPU AS LONG AS POSSABLE, conevert to cpu minimal --   torch.cuda.synchronize() to test if gpu slow since .cpu() is a sync point -- use manual         torch.cuda.synchronize()
@@ -189,9 +189,10 @@ def main():
 
         tracker.positionFinder(tracker.currImage)
         
-        if tracker.nailPosX != -1 and tracker.wristX != -1:
-            if tracker.walkTillHit() == None:
-                tracker.DrawFailCode()
+        if tracker.nailPosX == -1 or tracker.wristX == -1:
+            tracker.DrawFailCode()
+        elif tracker.walkTillHit() == None:
+            tracker.DrawFailCode()
 
         cv2.imshow("Video",tracker.currImage)
         
