@@ -1,5 +1,5 @@
  # Point-DPT
-The **only** documented instance of an open-source pointer software that utilizes the position of the user's index finger to ascertain the specific location on the screen they are pointing towards, without requiring external depth cameras or sensors.
+The **only** documented instance of an open-source pointer software that utilizes the position of the user's index finger to ascertain the specific location on the screen they are pointing towards, without requiring external depth cameras or sensors -- showed off with a program which focuses a pointed finger for individuals with tremor's in hands to beable to reliabley point at objects
 
 
 ## How are Pipeline Works
