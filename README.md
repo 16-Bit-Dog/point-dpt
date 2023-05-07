@@ -32,7 +32,7 @@ we will assume that performance issues are not a significant concern within reas
 Clone the repo:<br />
 ```$ git clone https://github.com/16-Bit-Dog/point-dpt```<br />
 Install requirments by running the following command in the point-dpt directory<br />
-```$ pip install -r requirments.txt```
+```$ pip install -r requirements.txt```
 
 ### RECOMMENDED METHOD TO USING THE PROGRAM
 - To ensure proper depth creation for the index finger and index finger bone, and to map out the entire hand using our hand tracker; it is recommended to face your hand flat and keep all five finger tips visible inside the rendered frame.
