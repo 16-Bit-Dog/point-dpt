@@ -1,4 +1,4 @@
- # Point-DPT
+# Point-DPT
 The **only** documented instance of an open-source pointer software that utilizes the position of the user's index finger to ascertain the specific location on the screen they are pointing towards, without requiring external depth cameras or sensors -- showed off with a program which focuses a pointed finger for individuals with tremor's in hands to beable to reliabley point at objects
 
 
@@ -25,7 +25,7 @@ or
 we will assume that performance issues are not a significant concern within reason since camera images can be sent to an off-shore server to be processed for depth, thereby reducing the client overhead of using the AI model (which when profiled found the depth model as the most performance intensive:
 - Provides an intuitive and user-friendly interface without the need for special depth reading hardware.
 - Has diverse use cases, including aiding in furniture placement using finger gestures and mapping the hand movements of patients with limited hand mobility.
-- Enables pointing at objects of interest in situations where verbal communication is not possible, facilitating better text-to-speech tools by allowing users to      select specific blocks of text.
+- Enables pointing at objects of interest in situations where verbal communication is not possible, facilitating better text-to-speech tools by allowing users to select specific blocks of text to say outloud rather than type them.
 - Empowers hardware with limited capabilities to run AR/VR applications that rely on depth data.
 
 ### How To Build:
