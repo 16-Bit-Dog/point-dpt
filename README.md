@@ -22,7 +22,7 @@ or
 - GeForce RTX 3050-3060 (laptop & desktop)
 
 ### Future Use-Cases 
-we will assume that performance issues are not a significant concern within reason since camera images can be sent to an off-shore server to be processed for depth, thereby reducing the client overhead of using the AI model (which when profiled found the depth model as the most performance intensive:
+We will assume that performance issues are not a significant concern within reason since camera images can be sent to an off-shore server to be processed for depth, thereby reducing the client overhead of using the AI model (which when profiled found the depth model as the most performance intensive:
 - Provides an intuitive and user-friendly interface without the need for special depth reading hardware.
 - Has diverse use cases, including aiding in furniture placement using finger gestures and mapping the hand movements of patients with limited hand mobility.
 - Enables pointing at objects of interest in situations where verbal communication is not possible, facilitating better text-to-speech tools by allowing users to select specific blocks of text to say out-loud rather than type them.
