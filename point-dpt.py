@@ -193,7 +193,7 @@ def main():
     tracker.model = DPTForDepthEstimation.from_pretrained("Intel/dpt-hybrid-midas", low_cpu_mem_usage=True)
     #
     #get computational device -- prefer cuda
-    if torch.cuda.is_available:
+    if torch.cuda.is_available():
         tracker.device = torch.device("cuda:0")
         tracker.cudaFound = True
     else:
