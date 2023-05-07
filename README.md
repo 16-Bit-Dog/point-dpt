@@ -27,6 +27,8 @@ We will assume that performance issues are not a significant concern within reas
 - Has diverse use cases, including aiding in furniture placement using finger gestures and mapping the hand movements of patients with limited hand mobility.
 - Enables pointing at objects of interest in situations where verbal communication is not possible, facilitating better text-to-speech tools by allowing users to select specific blocks of text to say out-loud rather than type them.
 - Empowers more hardware to run AR applications -- since depth is an essential component to placing & contorting objects in an AR world accurately.
+- Medical World Applications are vast: in addition with Parkinson's Disease, many other neurodegenerative diseases such as Lou Gehrig's Disease, Multiple Sclerosis, and Alzheimier's Disease receive therapy and treatment options as patients motor skills' regress, and they struggle to identify objects.
+- Combining the software with text reading capable libraries like Tesseract allows a user to point at text, which is identified and read out loud, opening a new path of accessibility for patients that struggle linguistically and visually.
 
 ### How To Build:
 Clone the repo:</br>
