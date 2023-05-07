@@ -201,7 +201,7 @@ def main():
 
     #set computational device
     tracker.model.to(tracker.device)
-    
+    #print(tracker.device)
     #program main loop
     while True:
         tracker.IncFrameNum()
@@ -224,7 +224,8 @@ def main():
 
         #draw images
         cv2.imshow("Video",tracker.currImage)
-        cv2.imshow("Depth", tracker.currDepth)
+        if tracker.cudaFound:
+            cv2.imshow("Depth", tracker.currDepth)
         
         cv2.waitKey(1)
 
