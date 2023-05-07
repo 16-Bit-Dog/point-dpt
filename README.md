@@ -26,7 +26,7 @@ we will assume that performance issues are not a significant concern within reas
 - Provides an intuitive and user-friendly interface without the need for special depth reading hardware.
 - Has diverse use cases, including aiding in furniture placement using finger gestures and mapping the hand movements of patients with limited hand mobility.
 - Enables pointing at objects of interest in situations where verbal communication is not possible, facilitating better text-to-speech tools by allowing users to select specific blocks of text to say outloud rather than type them.
-- Empowers hardware with limited capabilities to run AR/VR applications that rely on depth data.
+- Empowers more hardware to run AR applications -- since depth is an essential component to placing & contorting objects in an AR world accurately.
 
 ### How To Build:
 Clone the repo:<br />
